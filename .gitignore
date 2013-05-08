@@ -12,8 +12,9 @@
 *.la
 *.a
 
+.temp_ascii
+
 *.jpg
-*.png
 *.mp4
 *.mpg
 *.jpeg

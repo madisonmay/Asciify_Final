@@ -1,0 +1,29 @@
+Installation Guide
+------------------
+
+Step 1 - Install the required dependencies
+------------------------------------------
+Imagemagick, ffmpeg, mencoder, opencv, and gimp are required to run this suite.
+Konsole is recommended for viewing ascii art in your terminal.
+Execute the following in your terminal to install these dependencies:
+
+=========================================================================================
+sudo apt-get install imagemagick ffmpeg gimp mencoder konsole python-opencv python-numpy;
+=========================================================================================
+
+
+Step 2 - Insert a custom gimp script for batch edge detection
+--------------------------------------------------------------
+Place edge-detect.scm in /home/{username}/.gimp-{version}/scripts/
+
+
+Step 3 - Add this directory to your .bashrc
+--------------------------------------------
+Open ~/.bashrc with the text editor of your choice and edit your
+path to include this directory.
+
+==========================
+export PATH="<path>:$PATH"
+==========================
+
+

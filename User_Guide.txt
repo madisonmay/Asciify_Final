@@ -1,0 +1,53 @@
+The following file types are currently supported:
+-------------------------------------------------
+.mp4
+.avi
+.jpg
+.png
+
+Please note that only Linux (Ubuntu) is currently supported.
+
+Typical Usage
+-------------
+To asciify a video, you need only provide a filename.
+
+========================
+$ asciify <filename.mp4>
+========================
+
+Images work the same way.
+
+========================
+$ asciify <filename.jpg>
+========================
+
+And folders are not a problem, either.
+
+==================
+$ asciify <folder>
+==================
+
+
+Optional Threshold Argument
+---------------------------
+As part of the edge-detection process, edges of varying brightnesses are produced.
+In order to prevent excess noise and in order to produce a black and white image,
+all pixels with brightness greater than 7 (a value we have found typically produces
+decent results) are converted to white pixels.  You can alter this sensitivity value
+by providing an integer as an optional argument via the command line.  For example:
+
+=========================
+$ asciify filename.mp4 12
+=========================
+
+To find the ideal threshold value, you can produce a set of 30 test images from a video.
+Simply use the following syntax:
+
+==========================
+$ test_images filename.mp4
+==========================
+
+The resultant images are saved in the folder Test_Images.  Each is saved as it's
+threshold value with a .png extension.  You can browse through these images and
+select the appropriate threshold for your video.
+
