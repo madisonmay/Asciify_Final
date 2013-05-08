@@ -125,7 +125,7 @@ void rejoin(string filename) {
 
   //rejoin audio and video
   cout << "Rejoining video and audio..." << endl;
-  command = "ffmpeg -i sound.mp4 -i video.mp4 "
+  command = "ffmpeg -y -i sound.mp4 -i video.mp4 "
          "-acodec copy -vcodec copy " + filename + "_ascii.mp4 > /dev/null 2> /dev/null";
   system(command.c_str());
 }
