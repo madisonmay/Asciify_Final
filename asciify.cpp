@@ -175,7 +175,7 @@ void clean_up(bool output) {
     cout << "Removing temporary directories..." << endl;
   }
 
-  system("rm -r .temp_ascii");
+  system("rm -r .temp_ascii 2> /dev/null");
 }
 
 void clean_folder() {
@@ -255,7 +255,7 @@ void process_image(string input_file, int threshold, bool output) {
   //chdir(".temp_ascii");
 
   //move image file to original directory
-  string command = "mv 00000001.jpg ../" + filename + "_ascii." + ext + " > /dev/null 2> /dev/null";
+  string command = "mv 00000001.jpg ../" + filename + "_ascii.jpg > /dev/null 2> /dev/null";
   system(command.c_str());
 }
 
@@ -284,21 +284,24 @@ void process_directory(string input_file, int threshold) {
   chdir(input_file.c_str());
 
   vector<string> files = getdir();
+  int count = 0;
 
   //Individually convert each file
   for (unsigned int i = 0;i < files.size();i++) {
     try {
       string image_file = files[i];
-      cout << image_file << endl;
       int length = image_file.length();
       string ext = image_file.substr(length-3);
       if ((ext == png) || (ext == jpg)) {
         create_directory(image_file, false);
         process_image(image_file, threshold, false);
         clean_up(false);
+        count ++;
+        cout <<"\rConverted [" << count << "] files to ascii...";
       }
     } catch (...) {}
   }
+  cout << endl;
 
 }
 
