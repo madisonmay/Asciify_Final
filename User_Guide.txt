@@ -1,5 +1,6 @@
 The following file types are currently supported:
 -------------------------------------------------
+.mpeg
 .mp4
 .avi
 .jpg
