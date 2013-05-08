@@ -4,13 +4,18 @@ Installation Guide
 Step 1 - Install the required dependencies
 ------------------------------------------
 Imagemagick, ffmpeg, mencoder, opencv, and gimp are required to run this suite.
-Konsole is recommended for viewing ascii art in your terminal.
+To view ascii art video with sound, libavcodec-extra-53 and mpg123 are required.
+Konsole is recommended for viewing ascii art video in your terminal.
 Execute the following in your terminal to install these dependencies:
 
-=========================================================================================
-sudo apt-get install imagemagick ffmpeg gimp mencoder konsole python-opencv python-numpy;
-=========================================================================================
+====================================================================================================================
+sudo apt-get install imagemagick ffmpeg gimp mencoder konsole python-opencv python-numpy libavcodec-extra-53 mpg123;
+====================================================================================================================
 
+This suite also supports processing of youtube videos, which requires the youtube-dl package.
+================================
+sudo apt-get install youtube-dl;
+================================
 
 Step 2 - Insert a custom gimp script for batch edge detection
 --------------------------------------------------------------
@@ -25,5 +30,3 @@ path to include this directory.
 ==========================
 export PATH="<path>:$PATH"
 ==========================
-
-
