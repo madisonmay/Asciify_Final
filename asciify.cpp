@@ -168,7 +168,7 @@ void finalize_video(string filename){
   string command = "ffmpeg -i final.mpg soundless.mp4 > /dev/null 2> /dev/null";
   system(command.c_str());
   cout << "Rejoining video and audio..." << endl;
-  command = "ffmpeg -i sound.mp4 -i soundless.mp4 "
+  command = "ffmpeg -y -i sound.mp4 -i soundless.mp4 "
          "-acodec copy -vcodec copy ../" + filename + "_ascii.mp4 > /dev/null 2> /dev/null";
   system(command.c_str());
 }

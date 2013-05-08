@@ -436,7 +436,6 @@ void textifyDirectory(int numConvert){
 				cout <<"Converted ["<< counter << "] files to ascii...";
 				cout<<"\r";
 				~img;}}}
-	cout<<"\n";
 	closedir(pdir);}
 
 //Currently a basic text menu.  Has a SINGLE IMAGE version along with MODIFY DIRECTORY version
