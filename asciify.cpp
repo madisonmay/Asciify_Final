@@ -1,6 +1,7 @@
 
 #include <stdio.h>      /* printf */
 #include <stdlib.h>     /* system, NULL, EXIT_FAILURE */
+#include <sys/stat.h>
 #include <string>
 #include <iostream>
 #include <istream>
@@ -28,9 +29,23 @@ bool fexists(const char *filename)
   return ifile;
 }
 
-void create_directories(string input_file) {
+//Checks if a folder exists given a name
+bool folder_exists(const char *foldername) {
+  DIR* dir = opendir(foldername);
+  if (dir) {
+    return true;
+    closedir(dir);
+  } else {
+    return false;
+  }
+}
+
+void create_directory(string input_file, bool output) {
   //make required directories
-  cout << "Creating temporary directories..." << endl;
+  if (output) {
+    cout << "Creating temporary directories..." << endl;
+  }
+
   system("mkdir \'.temp_ascii\' > /dev/null 2> /dev/null");
 
   //move the input file to the in directory
@@ -152,10 +167,14 @@ void join_part(bool first=false){
   }
 }
 
-void clean_up() {
+void clean_up(bool output) {
+
   chdir("..");
   //clean up the directories
-  cout << "Removing temporary directories..." << endl;
+  if (output) {
+    cout << "Removing temporary directories..." << endl;
+  }
+
   system("rm -r .temp_ascii");
 }
 
@@ -228,9 +247,7 @@ void process_image(string input_file, int threshold, bool output) {
   string ext = input_file.substr(length - 3);
   string jpg = "jpg";
 
-  if (ext == jpg) {
-    convert_to_png(input_file);
-  };
+  convert_to_png(input_file);
 
   edge_detect_directory(threshold, output);
   asciify_directory(output); //Brings to upper directory
@@ -272,10 +289,13 @@ void process_directory(string input_file, int threshold) {
   for (unsigned int i = 0;i < files.size();i++) {
     try {
       string image_file = files[i];
+      cout << image_file << endl;
       int length = image_file.length();
       string ext = image_file.substr(length-3);
       if ((ext == png) || (ext == jpg)) {
+        create_directory(image_file, false);
         process_image(image_file, threshold, false);
+        clean_up(false);
       }
     } catch (...) {}
   }
@@ -299,6 +319,11 @@ int main (int argc, char* argv[])
     exit(0);
   }
 
+  if (!fexists(input_file.c_str()) && !folder_exists(input_file.c_str())) {
+    cout << "The given file or folder does not exist.  Please try again..." << endl;
+    exit(0);
+  }
+
   //check for optional argument of threshold, default to 7
   if (argc > 2) {
       if (atoi(argv[2]) > 0) {
@@ -316,17 +341,24 @@ int main (int argc, char* argv[])
   string ext = input_file.substr(length - 3);
   string png = "png";
   string jpg = "jpg";
+  string is_folder = input_file.substr(length-4, 1);
+  string dot = ".";
 
-  create_directories(input_file);
-
-  //set filetypes for later use
-  if ((ext == png) || (ext == jpg)) {
-    process_image(input_file, threshold, true);
+  if (is_folder != dot) {
+    process_directory(input_file, threshold);
   } else {
-    process_video_by_part(input_file, threshold);
+    create_directory(input_file, true);
+
+    //set filetypes for later use
+    if ((ext == png) || (ext == jpg)) {
+      process_image(input_file, threshold, true);
+    } else {
+      process_video_by_part(input_file, threshold);
+    }
   }
 
-  clean_up();
+
+  clean_up(true);
 
   cout << "Asciification complete!" << endl;
   return 0;

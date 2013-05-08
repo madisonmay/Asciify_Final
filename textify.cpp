@@ -21,7 +21,7 @@ using std::endl;
 	sudo apt-get intall cimg-dev
 
 	HOW TO COMPILE:
-	g++ -o textify textify.cpp -O2 -L/usr/X11R6/lib -lm -lpthread -lX11
+	g++ -o textify textify_test.cpp -O2 -L/usr/X11R6/lib -lm -lpthread -lX11
 
 	HOW TO USE:
 	./textify.exe
@@ -404,9 +404,19 @@ void textifyToTerminal(unsigned char pix[]){
 //Takes ALL PNG IMAGES from the IN folder and outputs text files to the OUT if options suggest.
 //Testing mode calls textifyToTerminal for DEBUGGING and general TESTING
 //REQUIRES Directory in/ and out/ to exist in the same folder as the .exe
+
+std::string getcwd_string() {
+   char buff[PATH_MAX];
+   getcwd( buff, PATH_MAX );
+   std::string cwd( buff );
+   return cwd;
+}
+
 void textifyDirectory(int numConvert){
 	DIR *pdir = NULL;
-	pdir = opendir("./.temp_ascii");
+	std::string current_dir = getcwd_string();
+	std::string dir_path = current_dir + "/.temp_ascii";
+	pdir = opendir(dir_path.c_str());
 	struct dirent *pent = NULL;
 	if(pdir == NULL){
 		cout << "\nERROR! pdir could not be initilized correctly";
@@ -438,13 +448,28 @@ void textifyDirectory(int numConvert){
 				~img;}}}
 	closedir(pdir);}
 
+std::string get_selfpath() {
+    char buff[1024];
+    ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
+    if (len != -1) {
+      buff[len] = '\0';
+      return std::string(buff);
+    } else {
+     /* handle error condition */
+    }
+}
+
 //Currently a basic text menu.  Has a SINGLE IMAGE version along with MODIFY DIRECTORY version
-int main(){
+int main(int argc, char* argv[]){
 	//Initializes the Character pictures used to draw
 	for(int i = 0; i < 95; i++){
 		std::string name;
 		std::stringstream characters;
-		characters <<"chars/"<< i << ".png";
+		std::string self_path = get_selfpath();
+		int length = self_path.length();
+		self_path = self_path.substr(0, length-8);
+		std::string pathname = self_path + "/chars/";
+		characters << pathname << i << ".png";
 		name = characters.str();
 		CImg<unsigned char> character(name.c_str());
 		::chPics.insert(character, i);}
