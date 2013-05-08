@@ -10,7 +10,7 @@
 #include <vector>
 #include <regex>
 using namespace std;
-//g++ -o asciify wrapper_functioned.cpp -std=c++0x
+//g++ -o asciify asciify.cpp -std=c++0x
 string directory;
 string fps;
 //retrieves the current working directory
@@ -92,21 +92,27 @@ void convert_to_png(string input_file) {
     system(command.c_str());
 }
 
-void edge_detect_directory(int threshold) {
+void edge_detect_directory(int threshold, bool output) {
   //7 and 255 are thresholds for gimp to use
-  cout << "Producing edge-detected images..." << endl;
+  if (output) {
+    cout << "Producing edge-detected images..." << endl;
+  }
   string thresh = static_cast<ostringstream*>( &(ostringstream() << threshold) )->str();
   string command = "gimp -i -b '(edge-batch \"*.png\" " + thresh +
          " 255)' -b '(gimp-quit 0)' > /dev/null 2> /dev/null";
   system(command.c_str());
 }
 
-void asciify_directory() {
+void asciify_directory(bool output) {
   //convert to ascii art frames -- both edges and greyscale
   chdir("..");
-  cout << "Converting edge-detected images to ascii art..." << endl;
-  system("textify");
-  cout << "\n";
+  if (output) {
+    cout << "Converting edge-detected images to ascii art..." << endl;
+    system("textify");
+    cout << "\n";
+  } else {
+    system("textify > /dev/null 2> /dev/null");
+  }
   chdir(".temp_ascii");
 }
 
@@ -176,8 +182,8 @@ void process_video(string input_file, int threshold) {
   detect_framerate(input_file);
   extract_audio(input_file);
   split_frames(input_file);
-  edge_detect_directory(threshold);
-  asciify_directory();
+  edge_detect_directory(threshold, true);
+  asciify_directory(true);
   //system("mv ./in/sound.mp4 ./out > /dev/null 2> /dev/null");
   //chdir(".temp_ascii");
   rejoin(filename);
@@ -200,8 +206,8 @@ void process_video_by_part(string input_file, int threshold) {
   split_frames(input_file, seconds);
 
   while(fexists("00000001.png")){
-    edge_detect_directory(threshold);
-    asciify_directory();
+    edge_detect_directory(threshold, true);
+    asciify_directory(true);
     join_part(seconds == 0);
     clean_folder();
     seconds+=30;
@@ -215,7 +221,7 @@ void process_video_by_part(string input_file, int threshold) {
 
 }
 
-void process_image(string input_file, int threshold) {
+void process_image(string input_file, int threshold, bool output) {
 
   int length = input_file.length();
   string filename = input_file.substr(0, length - 4);
@@ -226,14 +232,29 @@ void process_image(string input_file, int threshold) {
     convert_to_png(input_file);
   };
 
-  edge_detect_directory(threshold);
-  asciify_directory(); //Brings to upper directory
+  edge_detect_directory(threshold, output);
+  asciify_directory(output); //Brings to upper directory
 
   //chdir(".temp_ascii");
 
   //move image file to original directory
   string command = "mv 00000001.jpg ../" + filename + "_ascii." + ext + " > /dev/null 2> /dev/null";
   system(command.c_str());
+}
+
+vector<string> getdir () {
+    DIR *dp;
+    vector<string> files;
+    struct dirent *dirp;
+    if((dp  = opendir(".")) == NULL) {
+        cout << "Error opening directory" << endl;
+    }
+
+    while ((dirp = readdir(dp)) != NULL) {
+        files.push_back(string(dirp->d_name));
+    }
+    closedir(dp);
+    return files;
 }
 
 void process_directory(string input_file, int threshold) {
@@ -254,7 +275,7 @@ void process_directory(string input_file, int threshold) {
       int length = image_file.length();
       string ext = image_file.substr(length-3);
       if ((ext == png) || (ext == jpg)) {
-        process_image(image_file, threshold);
+        process_image(image_file, threshold, false);
       }
     } catch (...) {}
   }
@@ -302,7 +323,7 @@ int main (int argc, char* argv[])
 
   //set filetypes for later use
   if ((ext == png) || (ext == jpg)) {
-    process_image(input_file, threshold);
+    process_image(input_file, threshold, true);
   } else {
     process_video_by_part(input_file, threshold);
   }

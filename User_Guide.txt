@@ -9,23 +9,11 @@ Please note that only Linux (Ubuntu) is currently supported.
 
 Typical Usage
 -------------
-To asciify a video, you need only provide a filename.
+To asciify a image, video, or folder, you need only provide a filename.
 
-========================
-$ asciify <filename.mp4>
-========================
-
-Images work the same way.
-
-========================
-$ asciify <filename.jpg>
-========================
-
-And folders are not a problem, either.
-
-==================
-$ asciify <folder>
-==================
+====================
+$ asciify <filename>
+====================
 
 
 Optional Threshold Argument
@@ -36,16 +24,16 @@ all pixels with brightness greater than 7 (a value we have found typically produ
 decent results) are converted to white pixels.  You can alter this sensitivity value
 by providing an integer as an optional argument via the command line.  For example:
 
-=========================
-$ asciify filename.mp4 12
-=========================
+==========================
+$ asciify <filename> [int]
+==========================
 
 To find the ideal threshold value, you can produce a set of 30 test images from a video.
 Simply use the following syntax:
 
-==========================
-$ test_images filename.mp4
-==========================
+========================
+$ test_images <filename>
+========================
 
 The resultant images are saved in the folder Test_Images.  Each is saved as it's
 threshold value with a .png extension.  You can browse through these images and

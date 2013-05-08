@@ -22,6 +22,7 @@ int main (int argc, char* argv[])
         video = argv[1];
     } else {
         cout << "Please provide the name of the file to process as a second argument";
+        exit(0);
     }
 
     command = "ffmpeg -ss 00:00:05 -i " + video + " test.png > /dev/null 2> /dev/null";
