@@ -21,7 +21,7 @@ int main (int argc, char* argv[])
     if (argc > 1) {
         video = argv[1];
     } else {
-        cout << "Please provide the name of the file to process as a second argument";
+        cout << "Please provide the name of the file to process as a second argument" << endl;
         exit(0);
     }
 
