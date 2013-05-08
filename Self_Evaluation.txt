@@ -1,3 +1,10 @@
+We're pleased that we were able to meet our goal of processing images and our stretch goal of 
+processing videos into ASCII art.  Over the course of this project, we learned a lot about 
+using python packages in general, as well as specific packages such as OpenCV, PIL, SimpleCV, and
+numpy.  We also learned about how video codecs work and used this knowledge to process videos
+with the help of ffmpeg and mencoder.  Overall, we consider the project a huge success and hope
+that people can get enjoyment out of what we produced.
+
 Although we're fairly happy with a current implementation, this is certainly room for improvement.
 For one, our c++ scripts require a large number of external dependencies, and rely on these programs
 to perform critical functions such as edge detection.  This means that as these programs age and
@@ -15,3 +22,7 @@ Some portions of our C++ code lack decent error handling and fail silently.  Thi
 to the tendency of ffmpeg to write absurb amounts of text to stderr (we tried to keep the feedback
 from asciify minimal) and partly because of our relative inexperience with C++.  A future version
 of our code would ideally do a better job of handling edge-cases.
+
+We're also happy with what we were able to do live, such as webcam processing and gradient-based 
+video processing.  Given more time, we could implement more things including multi-threading,
+adding more features, and increasing user-friendliness.
