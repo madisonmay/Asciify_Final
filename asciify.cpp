@@ -291,14 +291,12 @@ int main (int argc, char* argv[])
   string command;
   int threshold;
 
-  //get current working directory
-  directory = getcwd_string();
-
   //get filename
   if (argc > 1) {
     input_file = argv[1];
   } else {
-    cout << "Please provide the name of the file to process as a second argument";
+    cout << "Please provide the name of the file to process as a second argument" << endl;
+    exit(0);
   }
 
   //check for optional argument of threshold, default to 7
