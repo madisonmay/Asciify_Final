@@ -449,7 +449,7 @@ void textifyDirectory(int numConvert){
 	closedir(pdir);}
 
 std::string get_selfpath() {
-    char buff[1024];
+    char buff[2048];
     ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
     if (len != -1) {
       buff[len] = '\0';
