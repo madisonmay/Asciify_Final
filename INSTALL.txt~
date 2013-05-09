@@ -32,9 +32,9 @@ python setup.py
 	Step 1.2 - Prepare the python-based files to be executable
 	----------------------------------------------------------
 	NOTE: THIS STEP IS NOT REQUIRED IF YOU SUCCESSFULLY RUN SETUP.PY
-	===========================================================
-	chmod 755 fast_asciify internal/trifecta internal/asciifile
-	===========================================================
+	======================================
+	chmod 755 fast_asciify WebCam/trifecta
+	======================================
 
 Step 2 - Insert a custom gimp script for batch edge detection
 --------------------------------------------------------------
