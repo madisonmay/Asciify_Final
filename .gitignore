@@ -13,6 +13,7 @@
 *.a
 
 .temp_ascii
+*~
 
 *.jpg
 *.mp4
