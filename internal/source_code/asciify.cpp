@@ -1,19 +1,22 @@
 
 #include <stdio.h>      /* printf */
 #include <stdlib.h>     /* system, NULL, EXIT_FAILURE */
-#include <sys/stat.h>
 #include <string>
 #include <iostream>
 #include <istream>
 #include <fstream>
+#include <sstream>
 #include <dirent.h>
 #include <unistd.h>
 #include <vector>
 #include <regex>
 using namespace std;
-//g++ -o asciify asciify.cpp -std=c++0x
+//g++ -o asciify_temp asciify.cpp -std=c++0x
 string directory;
 string fps;
+double framerate;
+string width;
+string height;
 //retrieves the current working directory
 string getcwd_string() {
    char buff[PATH_MAX];
@@ -59,14 +62,14 @@ void create_directory(string input_file, bool output) {
 void extract_audio(string input_file) {
   //grab audio from video;
   cout << "Extracting audio from video file..." << endl;
-  string command = "ffmpeg -i " + input_file + " -ab 128k -ac 2"
+  string command = "ffmpeg -y -i " + input_file + " -ab 128k -ac 2"
             " -strict experimental -ar 44100 -vn sound.mp4  > /dev/null 2> /dev/null";
   system(command.c_str());
 }
 
 void detect_framerate(string input_file) {
   cout << "Detecting Frame Rate... ";
-  string command = "ffmpeg -i " + input_file + " 2>&1 | grep -o '[.0-9]\\{1,5\\}\\sfps' | grep -o '[.0-9]\\{1,5\\}' > fps.txt";
+  string command = "ffmpeg -i " + input_file + " 2>&1 | grep -o '[.0-9]\\{1,5\\}\\stbr' | grep -o '[.0-9]\\{1,5\\}' > fps.txt"; 
   system(command.c_str());
 
   ifstream fpstxt("fps.txt");
@@ -83,6 +86,28 @@ void detect_framerate(string input_file) {
     fps = "29.98";
     cout << "None detected, setting to 29.98" << endl;
   }
+  framerate = atof(fps.c_str());
+  //cout<<framerate<<endl;
+}
+
+void detect_resolution(string input_file){
+  cout<< "Detecting Video Resolution... ";
+  string command = "ffmpeg -i " + input_file + " 2>&1 | grep -o '\\s[0-9]\\{3,4\\}x[0-9]\\{3\\},' > res.txt";
+  system(command.c_str());
+  ifstream restxt("res.txt");
+  if(restxt.is_open()){
+    string res;
+    getline(restxt,res);
+    restxt.close();
+    if(res.length() == 0){
+      res = " 1280x640,";
+    }
+    //res = res.substr(1, res.length() - 1);
+    int l = res.length();
+    cout << "Detected resolution: " << res.c_str()<<endl;
+    width = res.substr(1, l - 6);
+    height = res.substr(l - 4, 3);
+  }
 }
 
 void split_frames(string input_file) {
@@ -92,12 +117,13 @@ void split_frames(string input_file) {
   system(command.c_str());
 }
 
-void split_frames(string input_file, int seconds){
+void split_frames(string input_file, double seconds, double sec_step){
   string begin_second = static_cast<ostringstream*>( &(ostringstream() << seconds) )->str();
-  int end = seconds + 30;
+  double end = seconds + sec_step;
   string end_second = static_cast<ostringstream*>( &(ostringstream() << end) )->str();
+  string step = static_cast<ostringstream*>( &(ostringstream() << sec_step) )->str();
   cout << "Getting frames in range [" + begin_second + ", " + end_second + "]..." << endl;
-  string command = "ffmpeg -ss " + begin_second + " -t 30 -i " + input_file + " -strict experimental -r " + fps + " %8d.png > /dev/null 2> /dev/null";
+  string command = "ffmpeg -ss " + begin_second + " -t " +step+ " -i " + input_file + " -strict experimental -r " + fps + " %8d.png > /dev/null 2> /dev/null";
   system(command.c_str());
 }
 
@@ -140,53 +166,40 @@ void asciify_directory(bool output) {
     cout << "\n";
   } else {
     string directory = get_selfpath();
-    string command = directory + "/internal/textify > /dev/null 2> /dev/null";
+    string command = directory.substr(0, directory.length() - 8) + "/internal/textify > /dev/null 2> /dev/null";
     system(command.c_str());
   }
   chdir(".temp_ascii");
 }
 
-void rejoin(string filename) {
-  //rejoin images
-  cout << "Rejoining images..." << endl;
-  string command = "mencoder mf://*.jpg -mf w=1280:h=720:fps="+ fps +":type=jpg -ovc "
-         "lavc -lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o video.mp4 > /dev/null 2> /dev/null";
-  system(command.c_str());
-
-  //rejoin audio and video
-  cout << "Rejoining video and audio..." << endl;
-  command = "ffmpeg -y -i sound.mp4 -i video.mp4 "
-         "-acodec copy -vcodec copy " + filename + "_ascii.mp4 > /dev/null 2> /dev/null";
-  system(command.c_str());
-}
-
-void join_part(bool first=false){
-  if(!first){
+void join_part(){
+  //If the file exists, appends the new portion to the end of it
+  if(fexists("final.mpg")){
     cout << "Joining video portions..." << endl;
-    string command = "mencoder mf://*.jpg -mf w=1280:h=720:fps="+ fps +":type=jpg -ovc "
+    string command = "mencoder mf://*.jpg -mf w="+width+":h="+height+":fps="+ fps +":type=jpg -ovc "
            "lavc -lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o part.mpg > /dev/null 2> /dev/null";
     system(command.c_str());
-
-    //Concatenates
+  
+    //Concatenates 
     command = "cat final.mpg part.mpg > temp.mpg";
     system(command.c_str());
     command = "rm final.mpg";
     system(command.c_str());
     command = "mv temp.mpg final.mpg";
     system(command.c_str());}
+  //Otherwise makes the first file
   else{
-    cout << "Joining video portions..." << endl;
-    string command = "mencoder mf://*.jpg -mf w=1280:h=720:fps="+ fps +":type=jpg -ovc "
+    cout << "Initializing Video File..." << endl;
+    string command = "mencoder mf://*.jpg -mf w="+width+":h="+height+":fps="+ fps +":type=jpg -ovc "
            "lavc -lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o final.mpg > /dev/null 2> /dev/null";
     system(command.c_str());
   }
 }
 
 void clean_up(bool output) {
-
   chdir("..");
   //clean up the directories
-  if (output) {
+  if(output){
     cout << "Removing temporary directories..." << endl;
   }
 
@@ -195,7 +208,6 @@ void clean_up(bool output) {
 
 void clean_folder() {
   system("rm *.png *.jpg");
-  //chdir("..");
 }
 
 void finalize_video(string filename){
@@ -207,45 +219,30 @@ void finalize_video(string filename){
   system(command.c_str());
 }
 
-void process_video(string input_file, int threshold) {
-
-  int length = input_file.length();
-  string filename = input_file.substr(0, length - 4);
-  string ext = input_file.substr(length - 3);
-
-  detect_framerate(input_file);
-  extract_audio(input_file);
-  split_frames(input_file);
-  edge_detect_directory(threshold, true);
-  asciify_directory(true);
-  //system("mv ./in/sound.mp4 ./out > /dev/null 2> /dev/null");
-  //chdir(".temp_ascii");
-  rejoin(filename);
-
-  //move file from inner directory
-  string command = "mv " + filename + "_ascii.mp4 ../ > /dev/null 2> /dev/null";
-  system(command.c_str());
-
-}
-
-
 void process_video_by_part(string input_file, int threshold) {
 
   int length = input_file.length();
   string filename = input_file.substr(0, length - 4);
   string ext = input_file.substr(length - 3);
   detect_framerate(input_file);
-  extract_audio(input_file);
-  int seconds = 0;
-  split_frames(input_file, seconds);
+  detect_resolution(input_file);
+  double sec_step = 1000.0 / framerate;
+  cout<<"The video will be processed in steps of "<<sec_step<<"s"<<endl;
+  if(!fexists(".temp_ascii/sound.mp4")){
+    extract_audio(input_file);}
+//  if(fexists(".temp_ascii/final.mpg")){
+//    seconds = 
+//  }
+  double seconds = 0;
+  split_frames(input_file, seconds, sec_step);
 
   while(fexists("00000001.png")){
     edge_detect_directory(threshold, true);
     asciify_directory(true);
-    join_part(seconds == 0);
+    join_part();
     clean_folder();
-    seconds+=30;
-    split_frames(input_file, seconds);
+    seconds+=sec_step;
+    split_frames(input_file, seconds, sec_step);
     //chdir("..");
   }
   finalize_video(filename);
@@ -317,9 +314,7 @@ void process_directory(string input_file, int threshold) {
     } catch (...) {}
   }
   cout << endl;
-
 }
-
 
 //wrapper for asciify
 int main (int argc, char* argv[])
