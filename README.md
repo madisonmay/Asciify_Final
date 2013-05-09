@@ -2,13 +2,12 @@ Asciify_Final
 =============
 
 AsciiPy: A Software Design Project by Bill, Jacob, Madison, and Mitchell
-------------------------------------------------------------------------
 
 Installation Guide
 ------------------
 
-Step 1 - Install the required dependencies
-------------------------------------------
+### Step 1 - Install the required dependencies
+
 Imagemagick, ffmpeg, mencoder, opencv, and gimp are required to run this suite.
 To view ascii art video with sound, libavcodec-extra-53 and mpg123 are required.
 Konsole is recommended for viewing ascii art video in your terminal.
@@ -23,13 +22,13 @@ This suite also supports processing of youtube videos, which requires the youtub
 sudo apt-get install youtube-dl;
 ```
 
-Step 2 - Insert a custom gimp script for batch edge detection
---------------------------------------------------------------
+### Step 2 - Insert a custom gimp script for batch edge detection
+
 Place edge-detect.scm in /home/{username}/.gimp-{version}/scripts/
 
 
-Step 3 - Add this directory to your .bashrc
---------------------------------------------
+### Step 3 - Add this directory to your .bashrc
+
 Open ~/.bashrc with the text editor of your choice and edit your
 path to include this directory.
 
@@ -39,34 +38,34 @@ export PATH="<path>:$PATH"
 
 Executables
 -----------
-asciify - main wrapper for conversion of videos, images, and folders to edge-detected ascii art
-textify - for internal use only, handles the majority of processing workload for asciify
-test_images - used to determine the ideal white threshold value for a video
+- asciify - main wrapper for conversion of videos, images, and folders to edge-detected ascii art
+- textify - for internal use only, handles the majority of processing workload for asciify
+- test_images - used to determine the ideal white threshold value for a video
 
 C++ Files
 ---------
-asciify.cpp - source code for asciify
-textify.cpp - source code for textify
-test_images.cpp - source code for test_images
+- asciify.cpp - source code for asciify
+- textify.cpp - source code for textify
+- test_images.cpp - source code for test_images
 
 Folders
 -------
-chars - image files for 94 ascii characters
+- chars - image files for 94 ascii characters
 
 Text Files
 ----------
-INSTALL.txt - an installation guide
-User_Guide.txt - a how-to guide for this ascii art suite
-Design_Guide.txt - an explanation of the asciification process
-Self_Evaluation.txt - current successes and future improvements
+- INSTALL.txt - an installation guide
+- User_Guide.txt - a how-to guide for this ascii art suite
+- Design_Guide.txt - an explanation of the asciification process
+- Self_Evaluation.txt - current successes and future improvements
 
 The following file types are currently supported:
 -------------------------------------------------
-.mpeg
-.mp4
-.avi
-.jpg
-.png
+- .mpeg
+- .mp4
+- .avi
+- .jpg
+- .png
 
 Please note that only Linux (Ubuntu) is currently supported.
 
