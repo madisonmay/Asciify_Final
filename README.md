@@ -28,7 +28,7 @@ Execute the following in your terminal to install these dependencies:
 sudo apt-get install imagemagick ffmpeg gimp mencoder konsole python-opencv python-numpy libavcodec-extra-53 mpg123;
 ```
 
-This suite also supports processing of youtube videos, which requires the youtube-dl 		package.
+This suite also supports processing of youtube videos, which requires the youtube-dl package.
 
 ```
 sudo apt-get install youtube-dl;
@@ -62,7 +62,7 @@ export PATH="<path>:$PATH"
 - setup.py - used to install dependencies and grant permission to executables
 - asciify - main wrapper for conversion of videos, images, and folders to an edge-detected -ascii art file
 - test_images - used to determine the ideal white threshold value for a video
-- fast_asciify - wrapper for printing gradient ascii in the terminaleo
+- fast_asciify - wrapper for printing gradient ascii in the terminal
 
 ### Internal Files
 
