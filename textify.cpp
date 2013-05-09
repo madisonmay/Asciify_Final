@@ -467,7 +467,7 @@ int main(int argc, char* argv[]){
 		std::stringstream characters;
 		std::string self_path = get_selfpath();
 		int length = self_path.length();
-		self_path = self_path.substr(0, length-8);
+		self_path = self_path.substr(0, length - 17);
 		std::string pathname = self_path + "/chars/";
 		characters << pathname << i << ".png";
 		name = characters.str();
