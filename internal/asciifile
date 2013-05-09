@@ -9,6 +9,8 @@ from sys import argv
 ### GOALS: import options - g, l, c, i, size; center text; adjust framerate; open second terminal, play sound
 ### STRETCH GOALS: multithread + speed up
 ### Fix file DNE errors
+### Improve ascii library + adjusting
+### Add help to asciifile
 
 def initialize():
 	global vidname
@@ -72,7 +74,7 @@ def asciify():
 	framestart=time()
 	starttime=time()
 	i = 1
-	while i<frames:
+	while i<=frames:
 		txtnum=str(i).rjust(8,'0')
 
 		img = Image.open('Frames/'+txtnum+'.jpeg')

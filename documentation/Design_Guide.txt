@@ -1,0 +1,27 @@
+Design Choices
+--------------
+
+In general, one of two paths is followed during program execution.
+
+The first program path handles pre-existing files. If a video file is fed to our program,
+it is first unpacked into image files by ffmpeg and placed into a temporary directory.
+Audio is extracted from the original video file, to be joined later with the final video.
+Each image is opened, and a series of operations are applied that link a ascii character
+to a similarly sized portion of the input image.  In the gradient (fast_asciify) version of
+our code, this means the saturation of the original image is matched to a character.
+In the slower (asciify) version, gimp applies laplacian edge detection to each image
+and produces a second image for each input image.  These edge-detection images are then
+fed to our algorithm to be matched with ascii characters.  We handled the asciify version
+in C++ to make the processing time required a bit more bearable.
+
+At this point, the text is either displayed in the terminal (as is the case with
+fast_asciify, which also uses a less effective, quicker edge detection) or compiled into 
+an image (as is done with asciify).  With asciify, these files are then joined into a video 
+and the original audio is reapplied.
+
+If an image file or folder of images is fed to our program, this same basic path is
+followed -- however, audio extraction is not required.
+
+In the second major execution path, opencv loads images from the webcam and these
+are processed without saving intermediate files.  By eliminating file I/O and gimp
+edge detection from the execution path, we see a drastic speed increase.

@@ -6,6 +6,8 @@ Step 1 - Run setup.py
 Running setup.py from within the asciify directory will automatically
 install and set-up many dependencies and prepare parts of asciify to run.
 
+Additionally, it is expected that the user is running python 2.7.
+
 ===============
 python setup.py
 ===============
