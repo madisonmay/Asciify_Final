@@ -4,7 +4,7 @@ from os import system
 from os import listdir
 from time import time
 from PIL import Image
-from sys import argv
+from sys import argv, exit
 
 ### GOALS: import options - g, l, c, i, size; center text; adjust framerate; open second terminal, play sound
 ### STRETCH GOALS: multithread + speed up
@@ -49,20 +49,21 @@ def get_vid():
 	try:
 		user_in = argv[1]
 	except IndexError:
-		user_in = ''
-	if user_in!='':
-		system("mkdir -p Frames")
-		print('Making and/or clearing directories...')
-		system('rm -rf Frames/*')
-		system('rm -rf '+vidname)
-		print('Directories cleared.')
-		if "youtube.com" in user_in:
-			download(user_in)
-		elif "." in user_in:
-			vidname = user_in
-		else:
-			download("ytsearch:"+user_in)
-		explode()
+		#user_in = ''
+                exit(0)
+	#if user_in!='':
+	system("mkdir -p Frames")
+	print('Making and/or clearing directories...')
+	system('rm -rf Frames/*')
+	system('rm -rf '+vidname)
+	print('Directories cleared.')
+	if "youtube.com" in user_in:
+		download(user_in)
+	elif "." in user_in:
+		vidname = user_in
+	else:
+		download("ytsearch:"+user_in)
+	explode()
 
 def asciify():
 	global asciiGroup
