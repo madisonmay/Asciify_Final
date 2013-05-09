@@ -156,6 +156,7 @@ def help():
     print('-tw <int>     :    Set width of terminal')
     print('-fw <int>     :    Set width of frame')
     print('-i            :    Invert the output color')
+    print('-f <filename> :    Process image or video from file')
     exit(0)
 
 
@@ -164,6 +165,7 @@ def arg_processing():
     tw = False
     fw = False
     invert = False
+    filename = ''
 
     for i in range(1, len(argv)):
         try:
@@ -171,8 +173,14 @@ def arg_processing():
         except IndexError:
             inp = False
             
-        if inp == '-g' or inp == '-l' or inp == '-c' or inp == '-t' or inp == '-f' and not mode:
+        if inp == '-g' or inp == '-l' or inp == '-c' or inp == '-t' and not mode:
             mode = inp
+        elif inp == '-f' and not mode:
+            mode = inp
+            try:
+                filename = argv[i+1]
+            except IndexError:
+                pass
         elif inp == '-h' or inp == '--help':
             help()
         elif inp == '-tw':
@@ -202,7 +210,7 @@ def arg_processing():
         os.system(os.path.dirname(argv[0])+'/internal/trifecta -tw ' + str(tw) +' -fw ' + str(fw) + (' -i'*invert))
         exit(0)
     if mode == '-f':
-        os.system(os.path.dirname(argv[0])+'/internal/asciifile')
+        os.system(os.path.dirname(argv[0])+'/internal/asciifile ' + filename)
 
         exit(0)
     return [mode, tw, fw, invert]

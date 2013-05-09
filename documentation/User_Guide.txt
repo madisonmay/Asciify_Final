@@ -11,12 +11,11 @@ Please note that only Linux (Ubuntu) and python 2.7 are currently supported.
 Typical Usage (asciify):
 ------------------------
 
-To asciify a image, video, or folder, you need only provide a filename.
+To asciify an image, video, or folder, you need only provide a filename.
 
 ====================
 $ asciify <filename>
 ====================
-
 
 Optional Threshold Argument
 ---------------------------
@@ -44,4 +43,27 @@ select the appropriate threshold for your video.
 Typical Usage (fast_asciify):
 -----------------------------
 
-To 
+To view an asciified webcam feed in the terminal, simply run fast_asciify with 
+the desired mode provided (-g, gradient; -l, laplacian; -c, combination (default).
+
+=====================
+$ fast_asciify [mode]
+=====================
+
+In addition, all three modes can be seen simultaniously by giving a mode argument
+of -t.
+
+To view an asciified photo or video on file, provide the -f argument and filename.
+
+============================
+$ fast_asciify -f <filename>
+============================
+
+To invert the ascii library (default is intended for light text on dark background),
+use the -i argument.
+
+=====================
+$ fast_asciify -i ...
+=====================
+
+Use the -h or --help arguments to view available arguments.

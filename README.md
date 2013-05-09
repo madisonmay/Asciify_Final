@@ -5,8 +5,20 @@ A Software Design Project by Bill, Jacob, Madison, and Mitchell
 Installation Guide
 ------------------
 
-### Step 1 - Install the required dependencies
+### Step 1 - Run setup.py
 
+Running setup.py from within the asciify directory will automatically
+install and set-up many dependencies and prepare parts of asciify to run.
+
+Additionally, it is expected that the user is running python 2.7.
+
+```
+python setup.py
+```
+
+#### Step 1.1 - Install the required dependencies
+
+NOTE: THIS STEP IS NOT REQUIRED IF YOU SUCCESSFULLY RUN SETUP.PY
 Imagemagick, ffmpeg, mencoder, opencv, and gimp are required to run this suite.
 To view ascii art video with sound, libavcodec-extra-53 and mpg123 are required.
 Konsole is recommended for viewing ascii art video in your terminal.
@@ -16,11 +28,20 @@ Execute the following in your terminal to install these dependencies:
 sudo apt-get install imagemagick ffmpeg gimp mencoder konsole python-opencv python-numpy libavcodec-extra-53 mpg123;
 ```
 
-This suite also supports processing of youtube videos, which requires the youtube-dl package.
+This suite also supports processing of youtube videos, which requires the youtube-dl 		package.
+
 ```
 sudo apt-get install youtube-dl;
 ```
 
+#### Step 1.2 - Prepare the python-based files to be executable
+
+NOTE: THIS STEP IS NOT REQUIRED IF YOU SUCCESSFULLY RUN SETUP.PY
+
+```
+chmod 755 fast_asciify internal/trifecta internal/asciifile
+```
+	
 ### Step 2 - Insert a custom gimp script for batch edge detection
 
 Place edge-detect.scm in /home/{username}/.gimp-{version}/scripts/
@@ -35,11 +56,19 @@ path to include this directory.
 export PATH="<path>:$PATH"
 ```
 
-### Executables
 
-- asciify - main wrapper for conversion of videos, images, and folders to edge-detected ascii art
-- textify - for internal use only, handles the majority of processing workload for asciify
+### User-executed Files
+
+- setup.py - used to install dependencies and grant permission to executables
+- asciify - main wrapper for conversion of videos, images, and folders to an edge-detected -ascii art file
 - test_images - used to determine the ideal white threshold value for a video
+- fast_asciify - wrapper for printing gradient ascii in the terminaleo
+
+### Internal Files
+
+- textify - handles the majority of processing workload for asciify
+- asciifile - handles file and link processing for fast_asciify
+- trifecta - handles trifecta mode for fast_asciify webcam processing
 
 ### C++ Files
 
@@ -50,13 +79,15 @@ export PATH="<path>:$PATH"
 ### Folders
 
 - chars - image files for 94 ascii characters
+- internal - internal files called by user-executed files
+- documentation - text files mostly for project deliverables
 
 ### Text Files
 
 - INSTALL.txt - an installation guide
-- User_Guide.txt - a how-to guide for this ascii art suite
-- Design_Guide.txt - an explanation of the asciification process
-- Self_Evaluation.txt - current successes and future improvements
+- README.txt - readme for package
+- README.md - readme for github
+
 
 ### The following file types are currently supported:
 
@@ -66,16 +97,15 @@ export PATH="<path>:$PATH"
 - .jpg
 - .png
 
-Please note that only Linux (Ubuntu) is currently supported.
+Please note that only Linux (Ubuntu) and python 2.7 are currently supported.
 
-### Typical Usage
+### Typical Usage (asciify)
 
 To asciify a image, video, or folder, you need only provide a filename.
 
 ```
 $ asciify <filename>
 ```
-
 
 ### Optional Threshold Argument
 
@@ -100,11 +130,37 @@ The resultant images are saved in the folder Test_Images.  Each is saved as it's
 threshold value with a .png extension.  You can browse through these images and
 select the appropriate threshold for your video.
 
+### Typical Usage (fast_asciify)
+
+To view an asciified webcam feed in the terminal, simply run fast_asciify with 
+the desired mode provided (-g, gradient; -l, laplacian; -c, combination (default).
+
+```
+$ fast_asciify [mode]
+```
+
+In addition, all three modes can be seen simultaniously by giving a mode argument
+of -t.
+
+To view an asciified photo or video on file, provide the -f argument and filename.
+
+```
+$ fast_asciify -f <filename>
+```
+
+To invert the ascii library (default is intended for light text on dark background),
+use the -i argument.
+
+```
+$ fast_asciify -i ...
+```
+
+Use the -h or --help arguments to view available arguments.
+
 
 ### Design Choices
 
-
-In general, one of two paths are followed during program execution.
+In general, one of two paths is followed during program execution.
 
 The first program path handles pre-existing files. If a video file is fed to our program,
 it is first unpacked into image files by ffmpeg and placed into a temporary directory.
@@ -118,8 +174,9 @@ fed to our algorithm to be matched with ascii characters.  We handled the asciif
 in C++ to make the processing time required a bit more bearable.
 
 At this point, the text is either displayed in the terminal (as is the case with
-fast_asciify) or compiled into an image (as is done with asciify).  With asciify, these
-files are then joined into a video and the original audio is reapplied.
+fast_asciify, which also uses a less effective, quicker edge detection) or compiled into 
+an image (as is done with asciify).  With asciify, these files are then joined into a video 
+and the original audio is reapplied.
 
 If an image file or folder of images is fed to our program, this same basic path is
 followed -- however, audio extraction is not required.
