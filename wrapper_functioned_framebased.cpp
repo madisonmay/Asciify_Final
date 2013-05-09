@@ -11,7 +11,7 @@
 #include <vector>
 #include <regex>
 using namespace std;
-//g++ -o asciify_temp asciify.cpp -std=c++0x
+//g++ -o asciify wrapper_functioned_framebased.cpp -std=c++0x
 string directory;
 string fps;
 double framerate;
@@ -32,23 +32,9 @@ bool fexists(const char *filename)
   return ifile;
 }
 
-//Checks if a folder exists given a name
-bool folder_exists(const char *foldername) {
-  DIR* dir = opendir(foldername);
-  if (dir) {
-    return true;
-    closedir(dir);
-  } else {
-    return false;
-  }
-}
-
 void create_directory(string input_file, bool output) {
   //make required directories
-  if (output) {
-    cout << "Creating temporary directories..." << endl;
-  }
-
+  cout << "Creating temporary directories..." << endl;
   system("mkdir \'.temp_ascii\' > /dev/null 2> /dev/null");
 
   //move the input file to the in directory
@@ -62,7 +48,7 @@ void create_directory(string input_file, bool output) {
 void extract_audio(string input_file) {
   //grab audio from video;
   cout << "Extracting audio from video file..." << endl;
-  string command = "ffmpeg -y -i " + input_file + " -ab 128k -ac 2"
+  string command = "ffmpeg -i " + input_file + " -ab 128k -ac 2"
             " -strict experimental -ar 44100 -vn sound.mp4  > /dev/null 2> /dev/null";
   system(command.c_str());
 }
@@ -107,6 +93,7 @@ void detect_resolution(string input_file){
     cout << "Detected resolution: " << res.c_str()<<endl;
     width = res.substr(1, l - 6);
     height = res.substr(l - 4, 3);
+    cout<<res<<" "<<width.c_str()<<" "<<height.c_str()<<endl;
   }
 }
 
@@ -133,43 +120,36 @@ void convert_to_png(string input_file) {
     system(command.c_str());
 }
 
-void edge_detect_directory(int threshold, bool output) {
+void edge_detect_directory(int threshold) {
   //7 and 255 are thresholds for gimp to use
-  if (output) {
-    cout << "Producing edge-detected images..." << endl;
-  }
+  cout << "Producing edge-detected images..." << endl;
   string thresh = static_cast<ostringstream*>( &(ostringstream() << threshold) )->str();
   string command = "gimp -i -b '(edge-batch \"*.png\" " + thresh +
          " 255)' -b '(gimp-quit 0)' > /dev/null 2> /dev/null";
   system(command.c_str());
 }
 
-std::string get_selfpath() {
-    char buff[1024];
-    ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
-    if (len != -1) {
-      buff[len] = '\0';
-      return std::string(buff);
-    } else {
-     /* handle error condition */
-    }
-}
-
-void asciify_directory(bool output) {
+void asciify_directory() {
   //convert to ascii art frames -- both edges and greyscale
   chdir("..");
-  if (output) {
-    cout << "Converting edge-detected images to ascii art..." << endl;
-    string directory = get_selfpath();
-    string command = directory.substr(0, directory.length() - 8) + "/internal/textify";
-    system(command.c_str());
-    cout << "\n";
-  } else {
-    string directory = get_selfpath();
-    string command = directory.substr(0, directory.length() - 8) + "/internal/textify > /dev/null 2> /dev/null";
-    system(command.c_str());
-  }
+  cout << "Converting edge-detected images to ascii art..." << endl;
+  system("textify");
+  cout << "\n";
   chdir(".temp_ascii");
+}
+
+void rejoin(string filename) {
+  //rejoin images
+  cout << "Rejoining images..." << endl;
+  string command = "mencoder mf://*.jpg -mf w="+width+":h="+height+":fps="+ fps +":type=jpg -ovc "
+         "lavc -lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o video.mp4 > /dev/null 2> /dev/null";
+  system(command.c_str());
+
+  //rejoin audio and video
+  cout << "Rejoining video and audio..." << endl;
+  command = "ffmpeg -i sound.mp4 -i video.mp4 "
+         "-acodec copy -vcodec copy " + filename + "_ascii.mp4 > /dev/null 2> /dev/null";
+  system(command.c_str());
 }
 
 void join_part(){
@@ -196,18 +176,16 @@ void join_part(){
   }
 }
 
-void clean_up(bool output) {
+void clean_up() {
   chdir("..");
   //clean up the directories
-  if(output){
-    cout << "Removing temporary directories..." << endl;
-  }
-
-  system("rm -r .temp_ascii 2> /dev/null");
+  cout << "Removing temporary directories..." << endl;
+  system("rm -r .temp_ascii");
 }
 
 void clean_folder() {
   system("rm *.png *.jpg");
+  //chdir("..");
 }
 
 void finalize_video(string filename){
@@ -218,6 +196,28 @@ void finalize_video(string filename){
          "-acodec copy -vcodec copy ../" + filename + "_ascii.mp4 > /dev/null 2> /dev/null";
   system(command.c_str());
 }
+
+void process_video(string input_file, int threshold) {
+
+  int length = input_file.length();
+  string filename = input_file.substr(0, length - 4);
+  string ext = input_file.substr(length - 3);
+
+  detect_framerate(input_file);
+  extract_audio(input_file);
+  split_frames(input_file);
+  edge_detect_directory(threshold);
+  asciify_directory();
+  //system("mv ./in/sound.mp4 ./out > /dev/null 2> /dev/null");
+  //chdir(".temp_ascii");
+  rejoin(filename);
+
+  //move file from inner directory
+  string command = "mv " + filename + "_ascii.mp4 ../ > /dev/null 2> /dev/null";
+  system(command.c_str());
+
+}
+
 
 void process_video_by_part(string input_file, int threshold) {
 
@@ -237,8 +237,8 @@ void process_video_by_part(string input_file, int threshold) {
   split_frames(input_file, seconds, sec_step);
 
   while(fexists("00000001.png")){
-    edge_detect_directory(threshold, true);
-    asciify_directory(true);
+    edge_detect_directory(threshold);
+    asciify_directory();
     join_part();
     clean_folder();
     seconds+=sec_step;
@@ -252,68 +252,25 @@ void process_video_by_part(string input_file, int threshold) {
 
 }
 
-void process_image(string input_file, int threshold, bool output) {
+void process_image(string input_file, int threshold) {
 
   int length = input_file.length();
   string filename = input_file.substr(0, length - 4);
   string ext = input_file.substr(length - 3);
   string jpg = "jpg";
 
-  convert_to_png(input_file);
+  if (ext == jpg) {
+    convert_to_png(input_file);
+  };
 
-  edge_detect_directory(threshold, output);
-  asciify_directory(output); //Brings to upper directory
+  edge_detect_directory(threshold);
+  asciify_directory(); //Brings to upper directory
 
   //chdir(".temp_ascii");
 
   //move image file to original directory
-  string command = "mv 00000001.jpg ../" + filename + "_ascii.jpg > /dev/null 2> /dev/null";
+  string command = "mv 00000001.jpg ../" + filename + "_ascii." + ext + " > /dev/null 2> /dev/null";
   system(command.c_str());
-}
-
-vector<string> getdir () {
-    DIR *dp;
-    vector<string> files;
-    struct dirent *dirp;
-    if((dp  = opendir(".")) == NULL) {
-        cout << "Error opening directory" << endl;
-    }
-
-    while ((dirp = readdir(dp)) != NULL) {
-        files.push_back(string(dirp->d_name));
-    }
-    closedir(dp);
-    return files;
-}
-
-void process_directory(string input_file, int threshold) {
-  //Processes an entire directory of .jpgs or .pngs
-
-  string jpg = "jpg";
-  string png = "png";
-
-  cout << "Processing directory..." << endl;
-  chdir(input_file.c_str());
-
-  vector<string> files = getdir();
-  int count = 0;
-
-  //Individually convert each file
-  for (unsigned int i = 0;i < files.size();i++) {
-    try {
-      string image_file = files[i];
-      int length = image_file.length();
-      string ext = image_file.substr(length-3);
-      if ((ext == png) || (ext == jpg)) {
-        create_directory(image_file, false);
-        process_image(image_file, threshold, false);
-        clean_up(false);
-        count ++;
-        cout <<"\rConverted [" << count << "] files to ascii...";
-      }
-    } catch (...) {}
-  }
-  cout << endl;
 }
 
 //wrapper for asciify
@@ -324,17 +281,14 @@ int main (int argc, char* argv[])
   string command;
   int threshold;
 
+  //get current working directory
+  directory = getcwd_string();
+
   //get filename
   if (argc > 1) {
     input_file = argv[1];
   } else {
-    cout << "Please provide the name of the file to process as a second argument" << endl;
-    exit(0);
-  }
-
-  if (!fexists(input_file.c_str()) && !folder_exists(input_file.c_str())) {
-    cout << "The given file or folder does not exist.  Please try again..." << endl;
-    exit(0);
+    cout << "Please provide the name of the file to process as a second argument";
   }
 
   //check for optional argument of threshold, default to 7
@@ -354,24 +308,17 @@ int main (int argc, char* argv[])
   string ext = input_file.substr(length - 3);
   string png = "png";
   string jpg = "jpg";
-  string is_folder = input_file.substr(length-4, 1);
-  string dot = ".";
 
-  if (is_folder != dot) {
-    process_directory(input_file, threshold);
+  create_directory(input_file);
+
+  //set filetypes for later use
+  if ((ext == png) || (ext == jpg)) {
+    process_image(input_file, threshold);
   } else {
-    create_directory(input_file, true);
-
-    //set filetypes for later use
-    if ((ext == png) || (ext == jpg)) {
-      process_image(input_file, threshold, true);
-    } else {
-      process_video_by_part(input_file, threshold);
-    }
+    process_video_by_part(input_file, threshold);
   }
 
-
-  clean_up(true);
+  clean_up();
 
   cout << "Asciification complete!" << endl;
   return 0;

@@ -21,7 +21,7 @@ using std::endl;
 	sudo apt-get intall cimg-dev
 
 	HOW TO COMPILE:
-	g++ -o textify textify_test.cpp -O2 -L/usr/X11R6/lib -lm -lpthread -lX11
+	g++ -o textify textify.cpp -O2 -L/usr/X11R6/lib -lm -lpthread -lX11
 
 	HOW TO USE:
 	./textify.exe
