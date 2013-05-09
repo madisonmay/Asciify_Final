@@ -6,10 +6,11 @@ The following file types are currently supported:
 .jpg
 .png
 
-Please note that only Linux (Ubuntu) is currently supported.
+Please note that only Linux (Ubuntu) and python 2.7 are currently supported.
 
-Typical Usage
--------------
+Typical Usage (asciify):
+------------------------
+
 To asciify a image, video, or folder, you need only provide a filename.
 
 ====================
@@ -40,3 +41,7 @@ The resultant images are saved in the folder Test_Images.  Each is saved as it's
 threshold value with a .png extension.  You can browse through these images and
 select the appropriate threshold for your video.
 
+Typical Usage (fast_asciify):
+-----------------------------
+
+To 

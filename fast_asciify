@@ -171,7 +171,7 @@ def arg_processing():
         except IndexError:
             inp = False
             
-        if inp == '-g' or inp == '-l' or inp == '-c' or inp == '-t' and not mode:
+        if inp == '-g' or inp == '-l' or inp == '-c' or inp == '-t' or inp == '-f' and not mode:
             mode = inp
         elif inp == '-h' or inp == '--help':
             help()
@@ -200,6 +200,10 @@ def arg_processing():
         fw = 222
     if mode == '-t':
         os.system(os.path.dirname(argv[0])+'/internal/trifecta -tw ' + str(tw) +' -fw ' + str(fw) + (' -i'*invert))
+        exit(0)
+    if mode == '-f':
+        os.system(os.path.dirname(argv[0])+'/internal/asciifile')
+
         exit(0)
     return [mode, tw, fw, invert]
 
