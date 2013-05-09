@@ -118,15 +118,30 @@ void edge_detect_directory(int threshold, bool output) {
   system(command.c_str());
 }
 
+std::string get_selfpath() {
+    char buff[1024];
+    ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
+    if (len != -1) {
+      buff[len] = '\0';
+      return std::string(buff);
+    } else {
+     /* handle error condition */
+    }
+}
+
 void asciify_directory(bool output) {
   //convert to ascii art frames -- both edges and greyscale
   chdir("..");
   if (output) {
     cout << "Converting edge-detected images to ascii art..." << endl;
-    system("textify");
+    string directory = get_selfpath();
+    string command = directory.substr(0, directory.length() - 8) + "/internal/textify";
+    system(command.c_str());
     cout << "\n";
   } else {
-    system("textify > /dev/null 2> /dev/null");
+    string directory = get_selfpath();
+    string command = directory + "/internal/textify > /dev/null 2> /dev/null";
+    system(command.c_str());
   }
   chdir(".temp_ascii");
 }
