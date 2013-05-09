@@ -36,31 +36,31 @@ path to include this directory.
 export PATH="<path>:$PATH"
 ```
 
-Executables
------------
+### Executables
+
 - asciify - main wrapper for conversion of videos, images, and folders to edge-detected ascii art
 - textify - for internal use only, handles the majority of processing workload for asciify
 - test_images - used to determine the ideal white threshold value for a video
 
-C++ Files
----------
+### C++ Files
+
 - asciify.cpp - source code for asciify
 - textify.cpp - source code for textify
 - test_images.cpp - source code for test_images
 
-Folders
--------
+### Folders
+
 - chars - image files for 94 ascii characters
 
-Text Files
-----------
+### Text Files
+
 - INSTALL.txt - an installation guide
 - User_Guide.txt - a how-to guide for this ascii art suite
 - Design_Guide.txt - an explanation of the asciification process
 - Self_Evaluation.txt - current successes and future improvements
 
-The following file types are currently supported:
--------------------------------------------------
+### The following file types are currently supported:
+
 - .mpeg
 - .mp4
 - .avi
@@ -69,8 +69,8 @@ The following file types are currently supported:
 
 Please note that only Linux (Ubuntu) is currently supported.
 
-Typical Usage
--------------
+### Typical Usage
+
 To asciify a image, video, or folder, you need only provide a filename.
 
 ```
@@ -78,8 +78,8 @@ $ asciify <filename>
 ```
 
 
-Optional Threshold Argument
----------------------------
+### Optional Threshold Argument
+
 As part of the edge-detection process, edges of varying brightnesses are produced.
 In order to prevent excess noise and in order to produce a black and white image,
 all pixels with brightness greater than 7 (a value we have found typically produces
@@ -102,8 +102,8 @@ threshold value with a .png extension.  You can browse through these images and
 select the appropriate threshold for your video.
 
 
-Design Choices
---------------
+### Design Choices
+
 
 In general, one of two paths are followed during program execution.
 
