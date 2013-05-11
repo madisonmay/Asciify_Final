@@ -16,7 +16,7 @@ def initialize():
 	global vidname
 	global fps
 	global asciiGroup
-	fps = 20
+	fps = 30
 	vidname = "SPECIAL_NAME_DO_NOT_USE_CASUALLY.mp4"
 	asciiWeb = "##########**********oahkbdpqwmzcvunxrjft|?-+~<>!:,^`'.             "
 	asciiGroup = list(asciiWeb)
@@ -30,6 +30,7 @@ def download(link):
 def explode():
 	global fps
 	global vidname
+	print('Video being exploded into frames...')
 	system('ffmpeg -i '+vidname+' -r '+str(fps)+' -f image2 Frames/%8d.jpeg>/dev/null 2>&1')
 	print('VIDEO EXPLODED. Preparing to ASCIIfy...')
 	# extract sound
@@ -43,6 +44,8 @@ def explode():
 	# Youtube video raw link (signal "youtube.com") - must be full url
 	# Video file on disk (signal ".")
 	# Search term for youtube - multiple terms must be wrapped in quotes
+
+
 def get_vid():
 	global vidname
 	#user_in = raw_input('Enter the the video you wish to watch in ASCII: ')
@@ -71,7 +74,6 @@ def asciify():
 
 	timing=0
 
-	begintime=time()
 	framestart=time()
 	starttime=time()
 	i = 1
@@ -100,10 +102,13 @@ def asciify():
 						printed = printed + asciiGroup[int(len(asciiGroup) - (pixel * len(asciiGroup))//256 - 1)]
 				printed = printed + '\n'
 
-		while (time()-framestart) < (1/fps):
-			pass
-		i+=1
-			
+		if (time() - starttime) > (i / fps):
+			i+=2
+		else:
+			while (time() - starttime) < (i / fps):
+				pass
+			i+=1
+		
 		framestart=time()
 		system('clear')
 		print(printed)
